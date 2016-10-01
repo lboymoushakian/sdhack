@@ -2,58 +2,81 @@
 #include <string>
 #include <fstream>
 #include <ctime>
+#include <vector>
+#include <random>
 using namespace std;
+
+int randInt(int min, int max);
+void pull(vector<string> prompts, vector<string>responses);
 
 int main()
 {
     
-    string rArray[460];
-    string pArray[90];
+    //this first chunk gets all the lines from promptCards.txt and
+    //puts them into a vector called prompts
+    const char WORDFILENAME[] = "/Users/lariboymoushakian/sdhacks/promptCards.txt";
     
-    //feeds list of responses into an array
-    ifstream file("rwords.txt");
-    if(file.is_open())
+    vector<string> prompts;
+    string line;
+    
+    ifstream myfile (WORDFILENAME);
+    if (myfile.is_open())
     {
-        
-        
-        for(int i = 0; i != 460; i++)
-        {
-            file >> rArray[i];
-        }
+        while ( getline (myfile,line) )
+            prompts.push_back(line);
+        myfile.close();
     }
+        else cout << "Unable to open file";
+
+//for (vector<string>::const_iterator i = prompts.begin(); i != prompts.end(); ++i)
+//cout << *i << "\n";
+
+    //this gets all the lines from responseCards.txt and
+    //puts them into a vector called responses
+    const char WORDFILENAME2[] = "/Users/lariboymoushakian/sdhacks/responseCards.txt";
     
-    //feeds list of prompts into an array
-    ifstream file2("bwords.txt");
-    if(file2.is_open())
+    vector<string> responses;
+    ifstream myfile2 (WORDFILENAME2);
+    if(myfile2.is_open())
     {
+        while(getline (myfile2, line))
+            responses.push_back(line);
+        myfile2.close();
         
-        for(int i = 0; i != 90; i++)
-        {
-            file2 >> pArray[i];
-        }
+    }
+    else cout << "Unable to open file";
+    
+    char input;
+    cout << "Pull? y/n\n";
+    cin >> input;
+    while(input=='y' || input =='Y')
+    {
+    
+    pull(prompts, responses);
+        cout << "Pull again? y/n\n";
+        cin >> input;
     }
     
-    //initializes random number generator
-    srand((unsigned) time(NULL));
+    //for(vector<string>::const_iterator i = responses.begin(); i!=responses.end(); ++i)
+      //  cout << *i << "\n";
     
-    
-    string sInput = "";
-    string sResponse = "";
-    
-    while(1) {
-        cout << ">";
-        getline(cin, sInput);
-        int nSelection = rand() % 90;
-        sResponse = pArray[nSelection];
-        nSelection = rand() % 460;
-        sResponse += rArray[nSelection];
-        cout << sResponse << endl;
-    }
-    
-    return 0;
 }
 
+void pull(vector<string> prompts, vector<string>responses)
+{
+    int a = randInt(0, (int)prompts.size());
+    int b = randInt(0, (int)responses.size());
+    cout << prompts[a] << "\n";
+    cout << responses[b] << "\n";
+}
 
-
-
-
+// Return random int from min to max, inclusive
+int randInt(int min, int max)
+{
+    if (max < min)
+        swap(max, min);
+    static random_device rd;
+    static mt19937 generator(rd());
+    uniform_int_distribution<> distro(min, max);
+    return distro(generator);
+}
